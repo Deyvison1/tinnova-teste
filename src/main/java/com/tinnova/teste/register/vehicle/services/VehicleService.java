@@ -75,7 +75,7 @@ public class VehicleService {
 	@SuppressWarnings("unchecked")
 	public List<VehicleDTO> getAllByFilters(final String brand, final String color, final int yearVehicle) {
 		StringBuilder nativeSql = new StringBuilder();
-		nativeSql.append("SELECT * FROM public.vehicle vehicle where 1 = 1 ");
+		nativeSql.append("SELECT * FROM Vehicle vehicle where 1 = 1 ");
 		if (Strings.isNotEmpty(brand)) {
 			nativeSql.append(" and vehicle.brand = " + brand);
 		}
@@ -87,6 +87,7 @@ public class VehicleService {
 		if (yearVehicle > 0) {
 			nativeSql.append(" and vehicle.year_vehicle = " + yearVehicle);
 		}
+	
 		var result = entityManager.createNativeQuery(nativeSql.toString(), Vehicle.class);
 
 		return result.getResultList();
