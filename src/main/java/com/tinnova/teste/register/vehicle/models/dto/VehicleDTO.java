@@ -142,4 +142,18 @@ public class VehicleDTO implements Serializable {
 		}
 		return dtos;
 	}
+	
+	public static void preencheObjectoUpdate(Vehicle vehicle, VehicleDTO dto) {
+		if(Objects.nonNull(vehicle) && Objects.nonNull(dto)) {
+			vehicle.setId(dto.getId());
+			vehicle.setBrand(dto.getBrand());
+			vehicle.setCreated(dto.getCreated());
+			vehicle.setDescription(dto.getDescription());
+			vehicle.setSold(dto.isSold());
+			vehicle.setUpdated(dto.getUpdated());
+			vehicle.setVehicle(dto.getVehicle());
+			vehicle.setYear(dto.getYear());
+			vehicle.setColor(dto.getColor());
+		}
+	}
 }
