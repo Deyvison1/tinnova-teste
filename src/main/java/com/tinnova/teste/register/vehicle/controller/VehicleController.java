@@ -30,18 +30,18 @@ public class VehicleController {
 	}
 
 	@PostMapping("/create")
-	public void create(@RequestBody VehicleDTO dto) {
-		service.created(dto);
+	public ResponseEntity<VehicleDTO> create(@RequestBody VehicleDTO dto) {
+		return ResponseEntity.ok(service.created(dto));
 	}
 
-	@PutMapping("/update")
-	public void update(@RequestBody VehicleDTO dto) {
-		service.updated(dto);
+	@PutMapping("/update/{id}")
+	public void update(@RequestBody VehicleDTO dto, @PathVariable Long id) {
+		service.updated(dto, id);
 	}
 
 	@PatchMapping("/update-simple")
-	public void updateSimple(@RequestBody VehicleDTO dto) {
-		service.updated(dto);
+	public void updateSimple(@RequestBody VehicleDTO dto, Long id) {
+		service.updated(dto, id);
 	}
 
 	@GetMapping("/getAll")

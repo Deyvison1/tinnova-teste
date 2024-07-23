@@ -1,5 +1,6 @@
 package com.tinnova.teste.register.vehicle.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.logging.log4j.util.Strings;
@@ -16,6 +17,7 @@ import com.tinnova.teste.register.vehicle.models.dto.VehicleDTO;
 import com.tinnova.teste.register.vehicle.repository.VehicleRepository;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class VehicleService {
@@ -35,8 +37,9 @@ public class VehicleService {
 		return VehicleDTO.entityToDtoList(repository.findAll());
 	}
 
-	public void created(VehicleDTO dto) {
-		repository.save(VehicleDTO.dtoToEntity(dto));
+	public VehicleDTO created(VehicleDTO dto) {
+		Vehicle entity = repository.save(VehicleDTO.dtoToEntity(dto));
+		return VehicleDTO.entityToDTO(entity);
 	}
 
 	public Vehicle getById(Long id) {
@@ -46,16 +49,21 @@ public class VehicleService {
 			return vehicle;
 		} catch (ResourceNotFoundException e) {
 			log.error(e.getMessage());
-			throw new ResourceNotFoundException(e.getMessage());
+			throw new ResourceNotFoundException(id);
 		}
 	}
 
-	public void updated(VehicleDTO dto) {
-		log.info("Full update start");
-		Vehicle vehicle = getById(dto.getId());
-		VehicleDTO.preencheObjectoUpdate(vehicle, dto);
+	public void updated(VehicleDTO dto, Long id) {
+		try {
+			log.info("Full update start");
+			Vehicle vehicle = getById(id);
+			dto.setUpdated(LocalDateTime.now());
+			VehicleDTO.preencheObjectoUpdate(vehicle, dto);
 
-		repository.save(vehicle);
+			repository.save(vehicle);
+		} catch (EntityNotFoundException e) {
+			throw new ResourceNotFoundException(id);
+		}
 	}
 
 	public void delete(Long id) {
@@ -77,17 +85,17 @@ public class VehicleService {
 		StringBuilder nativeSql = new StringBuilder();
 		nativeSql.append("SELECT * FROM Vehicle vehicle where 1 = 1 ");
 		if (Strings.isNotEmpty(brand)) {
-			nativeSql.append(" and vehicle.brand = " + brand);
+			nativeSql.append(" and UPPER(vehicle.brand) = UPPER('" + brand + "')");
 		}
 
 		if (Strings.isNotEmpty(color)) {
-			nativeSql.append(" and vehicle.color = " + color);
+			nativeSql.append(" and UPPER(vehicle.color) = UPPER('" + color + "')");
 		}
 
 		if (yearVehicle > 0) {
 			nativeSql.append(" and vehicle.year_vehicle = " + yearVehicle);
 		}
-	
+
 		var result = entityManager.createNativeQuery(nativeSql.toString(), Vehicle.class);
 
 		return result.getResultList();
